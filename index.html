@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Stack Calculator — How Much Do Your Tools Cost?</title>
+    <meta name="description" content="Calculate the total cost of your SaaS stack. Compare prices and find cheaper alternatives. Save thousands per year.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            color: white;
+        }
+        header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        header p { font-size: 1.1rem; opacity: 0.9; }
+        
+        .calculator {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+        
+        .team-size {
+            margin-bottom: 30px;
+        }
+        .team-size label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #e2e8f0;
+            border-radius: 4px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .team-display {
+            background: #1a202c;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .tools-grid {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .tool-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto auto;
+            gap: 15px;
+            align-items: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tool-row:hover {
+            border-color: #667eea;
+        }
+        .tool-row input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .tool-info h4 {
+            color: #1a202c;
+            margin-bottom: 2px;
+        }
+        .tool-info span {
+            color: #718096;
+            font-size: 0.85rem;
+        }
+        .tool-price {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .tool-cost {
+            font-weight: bold;
+            color: #1a202c;
+            min-width: 80px;
+            text-align: right;
+        }
+        .alternative-link {
+            color: #10b981;
+            font-size: 0.85rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .alternative-link:hover {
+            text-decoration: underline;
+        }
+        
+        .total-section {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 24px;
+            text-align: center;
+        }
+        .total-section h3 {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+        .total-amount {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .total-yearly {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .savings-box {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .savings-box h3 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+        .savings-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .share-section {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .tool-row {
+                grid-template-columns: auto 1fr auto;
+                gap: 10px;
+            }
+            .tool-price, .alternative-link {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 SaaS Stack Calculator</h1>
+            <p>See how much your software stack costs — and how much you could save</p>
+        </header>
+        
+        <div class="calculator">
+            <div class="team-size">
+                <label>👥 Team Size</label>
+                <div class="slider-container">
+                    <input type="range" id="teamSize" min="1" max="100" value="5" oninput="updateCalculation()">
+                    <div class="team-display" id="teamDisplay">5</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-bottom: 16px; color: #4a5568;">Select Your Tools</h3>
+            
+            <div class="tools-grid" id="toolsGrid">
+                <!-- Tools will be generated by JavaScript -->
+            </div>
+            
+            <div class="total-section">
+                <h3>💸 Monthly Cost</h3>
+                <div class="total-amount" id="totalMonthly">$0</div>
+                <div class="total-yearly" id="totalYearly">$0/year</div>
+            </div>
+            
+            <div class="savings-box" id="savingsBox" style="display: none;">
+                <h3>💡 Potential Savings</h3>
+                <div class="savings-amount" id="savingsAmount">$0</div>
+                <p>per year by switching to alternatives</p>
+            </div>
+            
+            <div class="share-section">
+                <button class="btn-primary" onclick="copyLink()">🔗 Copy Link</button>
+                <button class="btn-secondary" onclick="resetCalculator()">🔄 Reset</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Built to help teams optimize their SaaS spending • No tracking, no cookies</p>
+        </footer>
+    </div>
+
+    <script>
+        const TOOLS = [
+            {
+                id: 'slack',
+                name: 'Slack',
+                category: 'Communication',
+                basePrice: 7.25,
+                priceType: 'per_user',
+                alternative: 'Discord (Free)',
+                savings: 7.25
+            },
+            {
+                id: 'notion',
+                name: 'Notion',
+                category: 'Productivity',
+                basePrice: 8,
+                priceType: 'per_user',
+                alternative: 'Obsidian (Free)',
+                savings: 8
+            },
+            {
+                id: 'figma',
+                name: 'Figma',
+                category: 'Design',
+                basePrice: 12,
+                priceType: 'per_editor',
+                alternative: 'Penpot (Free)',
+                savings: 12
+            },
+            {
+                id: 'linear',
+                name: 'Linear',
+                category: 'Project Management',
+                basePrice: 8,
+                priceType: 'per_user',
+                alternative: 'GitHub Projects (Free)',
+                savings: 8
+            },
+            {
+                id: 'github',
+                name: 'GitHub',
+                category: 'Development',
+                basePrice: 4,
+                priceType: 'per_user',
+                alternative: 'GitLab (Free)',
+                savings: 4
+            },
+            {
+                id: 'zoom',
+                name: 'Zoom',
+                category: 'Video',
+                basePrice: 13.99,
+                priceType: 'per_user',
+                alternative: 'Google Meet (Free)',
+                savings: 13.99
+            },
+            {
+                id: 'shopify',
+                name: 'Shopify',
+                category: 'E-commerce',
+                basePrice: 29,
+                priceType: 'flat',
+                alternative: 'WooCommerce (Free)',
+                savings: 29
+            },
+            {
+                id: 'mailchimp',
+                name: 'Mailchimp',
+                category: 'Email Marketing',
+                basePrice: 13,
+                priceType: 'flat',
+                alternative: 'Sendy ($69 one-time)',
+                savings: 13
+            },
+            {
+                id: 'hubspot',
+                name: 'HubSpot CRM',
+                category: 'CRM',
+                basePrice: 45,
+                priceType: 'per_user',
+                alternative: 'Notion CRM (Free)',
+                savings: 45
+            },
+            {
+                id: 'vercel',
+                name: 'Vercel Pro',
+                category: 'Hosting',
+                basePrice: 20,
+                priceType: 'per_user',
+                alternative: 'Netlify (Free)',
+                savings: 20
+            },
+            {
+                id: 'typeform',
+                name: 'Typeform',
+                category: 'Forms',
+                basePrice: 25,
+                priceType: 'flat',
+                alternative: 'Tally (Free)',
+                savings: 25
+            },
+            {
+                id: 'calendly',
+                name: 'Calendly',
+                category: 'Scheduling',
+                basePrice: 10,
+                priceType: 'per_user',
+                alternative: 'Cal.com (Free)',
+                savings: 10
+            }
+        ];
+
+        function initCalculator() {
+            const grid = document.getElementById('toolsGrid');
+            
+            TOOLS.forEach(tool => {
+                const row = document.createElement('div');
+                row.className = 'tool-row';
+                row.innerHTML = `
+                    <input type="checkbox" id="${tool.id}" onchange="updateCalculation()">
+                    <div class="tool-info">
+                        <h4>${tool.name}</h4>
+                        <span>${tool.category}</span>
+                    </div>
+                    <div class="tool-price">$${tool.basePrice}/${tool.priceType === 'per_user' || tool.priceType === 'per_editor' ? 'user' : 'mo'}</div>
+                    <div class="tool-cost" id="cost-${tool.id}">$0</div>
+                    <a href="#" class="alternative-link" onclick="showAlternative('${tool.id}')">Save $${tool.savings} →</a>
+                `;
+                grid.appendChild(row);
+            });
+            
+            updateCalculation();
+        }
+
+        function updateCalculation() {
+            const teamSize = parseInt(document.getElementById('teamSize').value);
+            document.getElementById('teamDisplay').textContent = teamSize;
+            
+            let totalMonthly = 0;
+            let potentialSavings = 0;
+            
+            TOOLS.forEach(tool => {
+                const checkbox = document.getElementById(tool.id);
+                const costElement = document.getElementById(`cost-${tool.id}`);
+                
+                if (checkbox.checked) {
+                    let cost = tool.basePrice;
+                    if (tool.priceType === 'per_user' || tool.priceType === 'per_editor') {
+                        cost = tool.basePrice * teamSize;
+                    }
+                    costElement.textContent = `$${cost.toLocaleString()}/mo`;
+                    totalMonthly += cost;
+                    potentialSavings += (tool.savings * (tool.priceType === 'per_user' || tool.priceType === 'per_editor' ? teamSize : 1));
+                } else {
+                    costElement.textContent = '$0';
+                }
+            });
+            
+            document.getElementById('totalMonthly').textContent = `$${totalMonthly.toLocaleString()}`;
+            document.getElementById('totalYearly').textContent = `$${(totalMonthly * 12).toLocaleString()}/year`;
+            
+            if (potentialSavings > 0) {
+                document.getElementById('savingsBox').style.display = 'block';
+                document.getElementById('savingsAmount').textContent = `$${(potentialSavings * 12).toLocaleString()}`;
+            } else {
+                document.getElementById('savingsBox').style.display = 'none';
+            }
+            
+            // Update URL
+            updateURL();
+        }
+
+        function updateURL() {
+            const teamSize = document.getElementById('teamSize').value;
+            const selectedTools = TOOLS.filter(t => document.getElementById(t.id).checked).map(t => t.id);
+            
+            const params = new URLSearchParams();
+            params.set('team', teamSize);
+            if (selectedTools.length > 0) {
+                params.set('tools', selectedTools.join(','));
+            }
+            
+            const newUrl = `${window.location.pathname}?${params.toString()}`;
+            window.history.replaceState({}, '', newUrl);
+        }
+
+        function showAlternative(toolId) {
+            const tool = TOOLS.find(t => t.id === toolId);
+            alert(`${tool.alternative}\n\nConsider switching to save $${tool.savings}/month!`);
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Link copied! Share with your team.');
+            });
+        }
+
+        function resetCalculator() {
+            document.getElementById('teamSize').value = 5;
+            TOOLS.forEach(tool => {
+                document.getElementById(tool.id).checked = false;
+            });
+            updateCalculation();
+        }
+
+        // Load from URL on startup
+        window.addEventListener('DOMContentLoaded', () => {
+            initCalculator();
+            
+            const params = new URLSearchParams(window.location.search);
+            const teamSize = params.get('team');
+            const tools = params.get('tools');
+            
+            if (teamSize) {
+                document.getElementById('teamSize').value = teamSize;
+            }
+            
+            if (tools) {
+                tools.split(',').forEach(toolId => {
+                    const checkbox = document.getElementById(toolId);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+            
+            updateCalculation();
+        });
+    </script>
+</body>
+</html>
